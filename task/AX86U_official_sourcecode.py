@@ -11,7 +11,7 @@ def get_version():
     print(req_date['Result']['Obj'][1]['Files'][0]['Version'])
     print(req_date['Result']['Obj'][1]['Files'][0]['ReleaseDate'])
     print(req_date['Result']['Obj'][1]['Files'][0]['DownloadUrl']['China'])
-    print(req_date['Result']['Obj'][1]['Files'][0]['Description'])
+    print(req_date['Result']['Obj'][1]['Files'][0]['Title'])
     return
 
-get_version()
+#get_version()
