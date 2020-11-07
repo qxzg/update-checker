@@ -1,6 +1,5 @@
-import requests
-from bs4 import BeautifulSoup
 import json
+import requests
 
 Base_Url="https://www.asus.com.cn/support/api/product.asmx/GetPDDrivers?osid=8&website=cn&pdhashedid=pezdd5ujcut73gz5&model=RT-AX86U"
 
