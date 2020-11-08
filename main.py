@@ -49,10 +49,50 @@ def get_push_info(target_push_id):
         return
     return gpi_info
 
+def get_task():
+    """
+    从数据库中获取task信息
+    返回1.总task个数
+        2.一个包含了N个字典的元组，包含每个任务id，模块名，启用状态，上一个版本号，推送目标id
+    """
+    get_task_count_sql = "SELECT COUNT(*) FROM `task`"
+    get_task_sql = "SELECT * FROM `task`"
+    global task_count
+    global tasks
+    tasks = []
+    gt_cursor = db.cursor()
+    try:
+        gt_cursor.execute(get_task_count_sql)
+        results = gt_cursor.fetchone()
+        task_count = int(results[0])
+        del gt_cursor
+        del results
+    except:
+        db.rollback()
+
+    gt_cursor = db.cursor()
+    try:
+        gt_cursor.execute(get_task_sql)
+        results = gt_cursor.fetchall()
+        for row in results:
+            tasks.append({
+                'task_id' : row[0],
+                'module_name' : row[2],
+                'enabled' : row[3],
+                'task_status' : row[4],
+                'last_run' : row[5],
+                'latest_version' : row[6],
+                'push_to' : row[8]
+            })
+    except:
+        pass
+    tasks = tuple(tasks)
+
 
 connect_db()
-
-print(get_push_info(1))
+get_task()
+tasks = tuple(tasks)
+print(type(tasks))
 
 db.close()
 
