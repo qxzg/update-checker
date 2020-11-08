@@ -5,7 +5,7 @@
  Target Server Version : 80018
  File Encoding         : 65001
 
- Date: 08/11/2020 19:05:37
+ Date: 08/11/2020 19:38:28
 */
 
 SET NAMES utf8mb4;
@@ -43,13 +43,13 @@ DROP TABLE IF EXISTS `task`;
 CREATE TABLE `task`  (
   `task_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '任务ID',
   `task_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '任务名',
-  `file_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '文件名',
+  `module_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '模块名',
   `enabled` varchar(5) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'no' COMMENT '启用状态',
   `task_status` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '任务状态',
   `last_run` datetime(6) NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '任务最后运行时间',
   `latest_version` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '最新版本号',
   `release_date` datetime(6) NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新日期',
-  `push_to` int(10) NOT NULL COMMENT '推送至ID',
+  `push_to` int(10) NOT NULL COMMENT '推送目标ID',
   PRIMARY KEY (`task_id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
