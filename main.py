@@ -29,7 +29,7 @@ def connect_db():
 def get_push_info(target_push_id):
     """
     获取目标的推送信息
-    返回一个字典
+    返回一个字典，包含该推送目标的所有信息
     """
     get_push_info_sql = "SELECT * FROM `push` \
                          WHERE `push_id` = '" + str(target_push_id) + "'"
