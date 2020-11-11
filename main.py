@@ -59,7 +59,7 @@ def get_task():
     get_task_sql = "SELECT * FROM `task`"
     global task_count
     global tasks
-    tasks = []
+    gt_task = []
     gt_cursor = db.cursor()
     try:
         gt_cursor.execute(get_task_count_sql)
@@ -75,7 +75,7 @@ def get_task():
         gt_cursor.execute(get_task_sql)
         results = gt_cursor.fetchall()
         for row in results:
-            tasks.append({
+            gt_task.append({
                 'task_id' : row[0],
                 'module_name' : row[2],
                 'enabled' : row[3],
@@ -86,13 +86,14 @@ def get_task():
             })
     except:
         pass
-    tasks = tuple(tasks)
+    tasks = tuple(gt_task)
+    del gt_task
 
 
 connect_db()
 get_task()
 tasks = tuple(tasks)
-print(type(tasks))
+print(tasks)
 
 db.close()
 
