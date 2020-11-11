@@ -14,4 +14,4 @@ def get_version():
     print(req_date['Result']['Obj'][1]['Files'][0]['Title'])
     return
 
-#get_version()
+# get_version()
