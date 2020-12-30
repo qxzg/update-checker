@@ -1,21 +1,31 @@
+#!/usr/bin/python
+# -*- coding: UTF-8 -*-
 import importlib
 import smtplib
 import pymysql
 import config 
+import requests
 import task #可以通过task.tasks获取模块名
 
-def push(push_through, target_id, message): 
+def push(push_through, target_id, push_message, push_title = "更新检查器推qw送"): 
     """
-        推送函数
-        push_through 推送方式
+        推送函数s
+        push_through 推送方式 = ["email","phone","sc","tg"]
         target_id 推送目标ID
-        message 推送信息
+        push_message 推送信息
+        push_title 推送标题
     """
+    if push_through == "sc":
+        sc_req = requests.post(url="https://sc.ftqq.com/"+get_push_info(1)['serverchan_key']+".send", data={"text":push_title, "desp":push_message})
+        if sc_req.json()['errmsg'] == "success":
+            return
+        else:
+            print("推送错误："+sc_req.json()['errmsg'])
     return
 
 def connect_db():
     """
-    docstring
+    连接数据库
     """
     global db
     db = pymysql.connect(host = config.DATABASE_CONFIG['host'],
@@ -91,12 +101,11 @@ def get_task():
 
 
 connect_db()
+push("sc",1,"sauiva买asasd的asda!!!!")
+"""
 get_task()
-tasks = tuple(tasks)
-print(tasks)
-
-db.close()
-
+print(type(tasks))
+"""
 
 """ 
 im = ["AX86U_official_sourcecode", "AX86U_official_firmware"]
@@ -105,3 +114,5 @@ for pkg in im:
     # imp.get_version()
     del imp
  """
+
+db.close()
