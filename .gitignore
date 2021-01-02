@@ -1,3 +1,4 @@
 config.py
 update_check.log
 *__pycache__*
+.venv/
