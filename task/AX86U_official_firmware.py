@@ -13,11 +13,13 @@ def get_info():
                     'DownloadUrl': req_date['Result']['Obj'][0]['Files'][0]['DownloadUrl']['China'],
                     'Text': req_date['Result']['Obj'][0]['Files'][0]['Description'].replace("<br/><br/>", "<br/>".replace("<br/>", "\r\n"))
                     }
+    """
     print(req_date['Result']['Obj'][0]['Name'])
     print(req_date['Result']['Obj'][0]['Files'][0]['Version'])
     print(req_date['Result']['Obj'][0]['Files'][0]['ReleaseDate'])
     print(req_date['Result']['Obj'][0]['Files'][0]['DownloadUrl']['China'])
     print(req_date['Result']['Obj'][0]['Files'][0]['Description'].replace("<br/><br/>", "<br/>".replace("<br/>", "\r\n")))
+    """
     return
 
 def check_update(latest_version):
