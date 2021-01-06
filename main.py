@@ -28,9 +28,9 @@ def push(push_through, target_id, push_message, push_title = "更新检查器推
     elif push_through == "tg":
         return
     elif push_through == "email":
-        return
+        return#TODO 实现邮件推送
     elif push_through == "phone":
-        return
+        return#TODO 实现短信推送
 
 def connect_db():
     """
@@ -154,6 +154,7 @@ if __name__ == '__main__':
             update_sql = "UPDATE `task` SET `task_status` = 'success' WHERE `task_id` = %d" % (i + 1)
         cursor = db.cursor()
         try:
+            print(update_sql)
             cursor.execute(update_sql)
             db.commit()
         except:
