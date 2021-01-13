@@ -8,7 +8,7 @@ import time
 import config
 import task #可以通过task.tasks获取模块名
 
-def push(push_through, target_id, push_message, push_title = "更新检查器推送"): #TODO title改为模块名+推送
+def push(push_through, target_id, push_message, push_title = "更新检查器推送"):
     """
         推送函数
         push_through 推送方式 = ["email","phone","sc","tg"]
@@ -17,7 +17,9 @@ def push(push_through, target_id, push_message, push_title = "更新检查器推
         push_title 推送标题
     """
     if push_through == "sc":
-        sc_req = requests.post(url="https://sc.ftqq.com/"+get_push_info(target_id)['serverchan_key']+".send", data={"text":push_title, "desp":push_message + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())})
+        sc_req = requests.post( url="https://sc.ftqq.com/" + get_push_info(target_id)['serverchan_key']+".send",
+                                data={ "text":push_title,
+                                       "desp":push_message + "（" + str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + "）" )})
         time.sleep(3)
         if sc_req.json()['errmsg'] == "success":
             print("SC Push Success!")
@@ -147,8 +149,8 @@ if __name__ == '__main__':
             update_sql = "UPDATE `task` SET `task_status` = 'error' WHERE `task_id` = %d" % (i + 1)
             push('sc', tasks[i]['push_to'], "【update-checker】 更新检查任务 %s 行失败。错误信息：'%s'" % (tasks[i]['task_name'], check_result[1]), "%s 检查更新时出错!" % (tasks[i]['task_name']))
             pass #TODO 更新最后运行时间以及状态
-        elif check_result[1] == 1:
-            push('sc', tasks[i]['push_to'], check_result[4])
+        elif check_result[1] == 1:    #如果有更新：
+            push('sc', tasks[i]['push_to'], check_result[4], "%s_检测到更新了！" % (tasks[i]['task_name'].replace(" ", "_")))
             update_sql = "UPDATE `task` SET `task_status` = 'success', `latest_version` = '%s', `release_date` = '%s' WHERE `task_id` = %d" % (check_result[2], check_result[3], i + 1)
         else:
             update_sql = "UPDATE `task` SET `task_status` = 'success' WHERE `task_id` = %d" % (i + 1)
