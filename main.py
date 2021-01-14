@@ -6,9 +6,11 @@ import pymysql
 import requests
 import time
 import config
-import task #可以通过task.tasks获取模块名
+import task  # 可以通过task.tasks获取模块名
+import logging
 
-def push(push_through, target_id, push_message, push_title = "更新检查器推送"):
+
+def push(push_through, target_id, push_message, push_title="更新检查器推送"):
     """
         推送函数
         push_through 推送方式 = ["email","phone","sc","tg"]
@@ -17,9 +19,9 @@ def push(push_through, target_id, push_message, push_title = "更新检查器推
         push_title 推送标题
     """
     if push_through == "sc":
-        sc_req = requests.post( url="https://sc.ftqq.com/" + get_push_info(target_id)['serverchan_key']+".send",
-                                data={ "text":push_title.replace(" ", "_"),
-                                       "desp":push_message + "  \n  \n###### " + str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))})
+        sc_req = requests.post(url="https://sc.ftqq.com/" + get_push_info(target_id)['serverchan_key']+".send",
+                               data={"text": push_title.replace(" ", "_"),
+                                     "desp": push_message + "  \n  \n###### " + str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))})
         time.sleep(3)
         if sc_req.json()['errmsg'] == "success":
             print("SC Push Success!")
@@ -30,22 +32,24 @@ def push(push_through, target_id, push_message, push_title = "更新检查器推
     elif push_through == "tg":
         return
     elif push_through == "email":
-        return#TODO 实现邮件推送
+        return  # TODO 实现邮件推送
     elif push_through == "phone":
-        return#TODO 实现短信推送
+        return  # TODO 实现短信推送
+
 
 def connect_db():
     """
     连接数据库
     """
     global db
-    db = pymysql.connect(host = config.DATABASE_CONFIG['host'],
-                     port = config.DATABASE_CONFIG['port'],
-                     user = config.DATABASE_CONFIG['username'],
-                     password = config.DATABASE_CONFIG['password'],
-                     db = config.DATABASE_CONFIG['dbname'],
-                     charset = config.DATABASE_CONFIG['charset'])
+    db = pymysql.connect(host=config.DATABASE_CONFIG['host'],
+                         port=config.DATABASE_CONFIG['port'],
+                         user=config.DATABASE_CONFIG['username'],
+                         password=config.DATABASE_CONFIG['password'],
+                         db=config.DATABASE_CONFIG['dbname'],
+                         charset=config.DATABASE_CONFIG['charset'])
     return
+
 
 def get_push_info(target_push_id):
     """
@@ -60,17 +64,18 @@ def get_push_info(target_push_id):
         gpi_results = gpi_cursor.fetchone()
         gpi_cursor.close
         gpi_info = {
-            'push_id' : gpi_results[0],
-            'push_name' : gpi_results[1],
-            'email_address' : gpi_results[2],
-            'phone_number' : gpi_results[3],
-            'serverchan_key' : gpi_results[4],
-            'tg_chat_id' : gpi_results[5]
+            'push_id': gpi_results[0],
+            'push_name': gpi_results[1],
+            'email_address': gpi_results[2],
+            'phone_number': gpi_results[3],
+            'serverchan_key': gpi_results[4],
+            'tg_chat_id': gpi_results[5]
         }
     except:
         print("[get_push_info] Error: unable to fetch data")
         return "error"
     return gpi_info
+
 
 def get_config(config_name):
     """
@@ -87,6 +92,7 @@ def get_config(config_name):
     except:
         print("[get_push_info] Error: unable to fetch data")
         return "error"
+
 
 def get_task():
     """
@@ -117,14 +123,14 @@ def get_task():
         gt_cursor.close
         for row in results:
             gt_task.append({
-                'task_id' : row[0],
-                'task_name' : row[1],
-                'module_name' : row[2],
-                'enabled' : row[3],
-                'task_status' : row[4],
-                'last_run' : row[5],
-                'latest_version' : row[6],
-                'push_to' : row[8]
+                'task_id': row[0],
+                'task_name': row[1],
+                'module_name': row[2],
+                'enabled': row[3],
+                'task_status': row[4],
+                'last_run': row[5],
+                'latest_version': row[6],
+                'push_to': row[8]
             })
     except:
         pass
@@ -132,6 +138,7 @@ def get_task():
     del gt_task
 
 #############################################################################
+
 
 if __name__ == '__main__':
     connect_db()
@@ -142,19 +149,26 @@ if __name__ == '__main__':
             continue
         imp = importlib.import_module('task.' + tasks[i]['module_name'])
         check_result = imp.check_update(tasks[i]['latest_version'])
-        #check_update函数，返回一个list。[状态(success,error), 如果状态为error则为错误信息，如果为success则为是否有更新(0为无更新，1为有更新)，如果有更新则依次为新版本号，发布时间，发布内容]
+        # check_update函数，返回一个list。[状态(success,error), 如果状态为error则为错误信息，如果为success则为是否有更新(0为无更新，1为有更新)，如果有更新则依次为新版本号，发布时间，发布内容]
         if (check_result[0] != 'error' and check_result[0] != 'success') or (check_result[0] == 'success' and (check_result[1] != 0 and check_result[1] != 1)):
-            update_sql = "UPDATE `task` SET `task_status` = 'error', `enabled` = 'no' WHERE `task_id` = %d" % (i + 1)
-            push('sc', tasks[i]['push_to'], "##### 【update-checker】 模块 `%s` 返回值错误，现已禁用该任务，请尽快检查该模块！  \n返回值为：  \n```  \n %s  \n```  \n" % (tasks[i]['task_name'], check_result), "模块%s出错!" % (tasks[i]['task_name']))
-        elif check_result[0] == 'error':#TODO 多次连续错误禁用该任务
-            update_sql = "UPDATE `task` SET `task_status` = 'error' WHERE `task_id` = %d" % (i + 1)
-            push('sc', tasks[i]['push_to'], "##### 【update-checker】 更新检查任务 `%s` 失败。  \n##### 错误信息：  \n```  \n %s  \n```  \n" % (tasks[i]['task_name'], check_result[1]), "%s 检查更新时出错!" % (tasks[i]['task_name']))
-            pass #TODO 更新最后运行时间以及状态
-        elif check_result[1] == 1:    #如果有更新：
-            push('sc', tasks[i]['push_to'], check_result[4], "%s_检测到更新了！" % (tasks[i]['task_name']))
-            update_sql = "UPDATE `task` SET `task_status` = 'success', `latest_version` = '%s', `release_date` = '%s' WHERE `task_id` = %d" % (check_result[2], check_result[3], i + 1)
+            update_sql = "UPDATE `task` SET `task_status` = 'error', `enabled` = 'no' WHERE `task_id` = %d" % (
+                i + 1)
+            push('sc', tasks[i]['push_to'], "##### 【update-checker】 模块 `%s` 返回值错误，现已禁用该任务，请尽快检查该模块！  \n返回值为：  \n```  \n %s  \n```  \n" %
+                 (tasks[i]['task_name'], check_result), "模块%s出错!" % (tasks[i]['task_name']))
+        elif check_result[0] == 'error':  # TODO 多次连续错误禁用该任务
+            update_sql = "UPDATE `task` SET `task_status` = 'error' WHERE `task_id` = %d" % (
+                i + 1)
+            push('sc', tasks[i]['push_to'], "##### 【update-checker】 更新检查任务 `%s` 失败。  \n##### 错误信息：  \n```  \n %s  \n```  \n" %
+                 (tasks[i]['task_name'], check_result[1]), "%s 检查更新时出错!" % (tasks[i]['task_name']))
+            pass  # TODO 更新最后运行时间以及状态
+        elif check_result[1] == 1:  # 如果有更新：
+            push('sc', tasks[i]['push_to'], check_result[4],
+                 "%s_检测到更新了！" % (tasks[i]['task_name']))
+            update_sql = "UPDATE `task` SET `task_status` = 'success', `latest_version` = '%s', `release_date` = '%s' WHERE `task_id` = %d" % (
+                check_result[2], check_result[3], i + 1)
         else:
-            update_sql = "UPDATE `task` SET `task_status` = 'success' WHERE `task_id` = %d" % (i + 1)
+            update_sql = "UPDATE `task` SET `task_status` = 'success' WHERE `task_id` = %d" % (
+                i + 1)
         cursor = db.cursor()
         try:
             print(update_sql)
@@ -165,4 +179,4 @@ if __name__ == '__main__':
         cursor.close()
 
     db.close()
-#TODO 错误捕获处理，记录，推送
+# TODO 错误捕获处理，记录，推送
