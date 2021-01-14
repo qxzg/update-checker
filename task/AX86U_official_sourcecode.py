@@ -32,7 +32,7 @@ def check_update(latest_version):
     for i in range(len(ver1)):
         if int(ver1[i]) < int(ver2[i]):
             release_date = request_data['ReleaseDate'].replace("/","-")
-            text = request_data['Text'] + "   请前往[华硕官网](https://www.asus.com.cn/Networking/RT-AX86U/HelpDesk_Download/)下载"#TODO sc推送换行
+            text = "#### " + request_data['Text'] + "   \n#### 请前往[华硕官网](https://www.asus.com.cn/Networking/RT-AX86U/HelpDesk_Download/)下载"
             return ["success", 1, request_data['Version'], release_date, text]
     return ["success", 0]
 

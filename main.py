@@ -18,8 +18,8 @@ def push(push_through, target_id, push_message, push_title = "更新检查器推
     """
     if push_through == "sc":
         sc_req = requests.post( url="https://sc.ftqq.com/" + get_push_info(target_id)['serverchan_key']+".send",
-                                data={ "text":push_title,
-                                       "desp":push_message + "（" + str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + "）" )})
+                                data={ "text":push_title.replace(" ", "_"),
+                                       "desp":push_message + "  \n  \n###### " + str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))})
         time.sleep(3)
         if sc_req.json()['errmsg'] == "success":
             print("SC Push Success!")
@@ -131,6 +131,7 @@ def get_task():
     tasks = tuple(gt_task)
     del gt_task
 
+#############################################################################
 
 if __name__ == '__main__':
     connect_db()
@@ -144,13 +145,13 @@ if __name__ == '__main__':
         #check_update函数，返回一个list。[状态(success,error), 如果状态为error则为错误信息，如果为success则为是否有更新(0为无更新，1为有更新)，如果有更新则依次为新版本号，发布时间，发布内容]
         if (check_result[0] != 'error' and check_result[0] != 'success') or (check_result[0] == 'success' and (check_result[1] != 0 and check_result[1] != 1)):
             update_sql = "UPDATE `task` SET `task_status` = 'error', `enabled` = 'no' WHERE `task_id` = %d" % (i + 1)
-            push('sc', tasks[i]['push_to'], "【update-checker】 模块 %s 返回值错误，现已禁用该任务，请尽快检查该模块！返回值为： %s" % (tasks[i]['task_name'], check_result), "模块%s出错!" % (tasks[i]['task_name']))
+            push('sc', tasks[i]['push_to'], "##### 【update-checker】 模块 `%s` 返回值错误，现已禁用该任务，请尽快检查该模块！  \n返回值为：  \n```  \n %s  \n```  \n" % (tasks[i]['task_name'], check_result), "模块%s出错!" % (tasks[i]['task_name']))
         elif check_result[0] == 'error':#TODO 多次连续错误禁用该任务
             update_sql = "UPDATE `task` SET `task_status` = 'error' WHERE `task_id` = %d" % (i + 1)
-            push('sc', tasks[i]['push_to'], "【update-checker】 更新检查任务 %s 行失败。错误信息：'%s'" % (tasks[i]['task_name'], check_result[1]), "%s 检查更新时出错!" % (tasks[i]['task_name']))
+            push('sc', tasks[i]['push_to'], "##### 【update-checker】 更新检查任务 `%s` 失败。  \n##### 错误信息：  \n```  \n %s  \n```  \n" % (tasks[i]['task_name'], check_result[1]), "%s 检查更新时出错!" % (tasks[i]['task_name']))
             pass #TODO 更新最后运行时间以及状态
         elif check_result[1] == 1:    #如果有更新：
-            push('sc', tasks[i]['push_to'], check_result[4], "%s_检测到更新了！" % (tasks[i]['task_name'].replace(" ", "_")))
+            push('sc', tasks[i]['push_to'], check_result[4], "%s_检测到更新了！" % (tasks[i]['task_name']))
             update_sql = "UPDATE `task` SET `task_status` = 'success', `latest_version` = '%s', `release_date` = '%s' WHERE `task_id` = %d" % (check_result[2], check_result[3], i + 1)
         else:
             update_sql = "UPDATE `task` SET `task_status` = 'success' WHERE `task_id` = %d" % (i + 1)
