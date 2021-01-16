@@ -19,15 +19,15 @@ def push(push_through, target_id, push_message, push_title="更新检查器推�
         push_title 推送标题
     """
     if push_through == "sc":
-        sc_req = requests.post(url="https://sc.ftqq.com/" + get_push_info(target_id)['serverchan_key']+".send",
+        sc_req = requests.post(url="https://sctapi.ftqq.com/" + get_push_info(target_id)['serverchan_key']+".send",
                                data={"text": push_title.replace(" ", "_"),
                                      "desp": push_message + "  \n  \n###### " + str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))})
         time.sleep(3)
-        if sc_req.json()['errmsg'] == "success":
+        if sc_req.json()['data']['error'] == "SUCCESS":
             print("SC Push Success!")
             return
         else:
-            print("推送错误："+sc_req.json()['errmsg'])
+            print("推送错误："+sc_req.json())
             return "fail"
     elif push_through == "tg":
         return
