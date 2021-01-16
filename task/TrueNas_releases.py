@@ -18,7 +18,7 @@ def check_update(latest_version):
     get_info()
     latest_version = int(latest_version)
     if latest_version < request_data['Version']:
-        return ["success", 1, request_data['Version'], request_data['ReleaseDate'], "#### " + request_data['Text'] + " 已发布"]
+        return ["success", 1, request_data['Version'], request_data['ReleaseDate'], "#### " + request_data['Text'] + " 已发布  \n #### Changelog: https://www.ixsystems.com/blog/library/" + request_data['Text'].lower().replace(".", "-")]
     else:
         return ["success", 0]
 
