@@ -9,6 +9,7 @@ import config
 import task  # 可以通过task.tasks获取模块名
 import logging
 import pathlib
+import traceback
 
 
 def push(push_through, target_id, push_message, push_title="更新检查器推送"):
@@ -24,6 +25,7 @@ def push(push_through, target_id, push_message, push_title="更新检查器推�
                                data={"text": push_title.replace(" ", "_"),
                                      "desp": push_message + "  \n  \n###### " + str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))})
         time.sleep(3)
+        sc_req.raise_for_status()
         if sc_req.json()['data']['error'] == "SUCCESS":
             print("SC Push Success!")
             return
@@ -149,10 +151,11 @@ if __name__ == '__main__':
         if tasks[i]['enabled'] != "yes":
             continue
         try:
-            imp = importlib.import_module('task.' + tasks[i]['module_name'])
+            imp = importlib.import_module('task.asdasd' + tasks[i]['module_name'])
         except ModuleNotFoundError:
-            print("[Error] %s ModuleNotFoundError" % (tasks[i]['module_name']))
-            push("sc", 1, "``` [Error] %s ModuleNotFoundError ```" % (tasks[i]['module_name']), "##### 【update-checker】模块无法找到错误")
+            print("[Error]")
+            traceback.print_exc()
+            push("sc", 1, "#### Error log:   \n ```  \n%s  \n```  \n" % (traceback.format_exc()), "【update-checker】模块无法找到错误")
             continue
         check_result = imp.check_update(tasks[i]['latest_version'])
         # check_update函数，返回一个list。[状态(success,error), 如果状态为error则为错误信息，如果为success则为是否有更新(0为无更新，1为有更新)，如果有更新则依次为新版本号，发布时间，发布内容]
