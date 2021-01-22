@@ -8,6 +8,7 @@ import time
 import config
 import task  # 可以通过task.tasks获取模块名
 import logging
+import pathlib
 
 
 def push(push_through, target_id, push_message, push_title="更新检查器推送"):
@@ -147,7 +148,12 @@ if __name__ == '__main__':
     for i in range(0, task_count):
         if tasks[i]['enabled'] != "yes":
             continue
-        imp = importlib.import_module('task.' + tasks[i]['module_name'])
+        try:
+            imp = importlib.import_module('task.' + tasks[i]['module_name'])
+        except ModuleNotFoundError:
+            print("[Error] %s ModuleNotFoundError" % (tasks[i]['module_name']))
+            push("sc", 1, "``` [Error] %s ModuleNotFoundError ```" % (tasks[i]['module_name']), "##### 【update-checker】模块无法找到错误")
+            continue
         check_result = imp.check_update(tasks[i]['latest_version'])
         # check_update函数，返回一个list。[状态(success,error), 如果状态为error则为错误信息，如果为success则为是否有更新(0为无更新，1为有更新)，如果有更新则依次为新版本号，发布时间，发布内容]
         if (check_result[0] != 'error' and check_result[0] != 'success') or (check_result[0] == 'success' and (check_result[1] != 0 and check_result[1] != 1)):
