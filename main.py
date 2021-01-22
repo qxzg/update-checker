@@ -152,7 +152,7 @@ if __name__ == '__main__':
             continue
         try:
             imp = importlib.import_module(
-                'task.asdasd' + tasks[i]['module_name'])
+                'task.' + tasks[i]['module_name'])
         except ModuleNotFoundError:
             print("[Error]")
             traceback.print_exc()
