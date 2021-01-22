@@ -5,7 +5,7 @@ Base_Url = "https://download.freenas.org/latest/CHECKSUMS.json"
 
 def get_info():
     global request_data
-    req = requests.get(url=Base_Url)
+    req = requests.get(url=Base_Url, timeout = 15)
     req_data = req.json()
     request_data = {
         'Version': int(req_data['date']),

@@ -5,7 +5,7 @@ Base_Url = "https://www.asus.com.cn/support/api/product.asmx/GetPDDrivers?osid=8
 
 def get_info():
     global request_data
-    req = requests.get(url=Base_Url)
+    req = requests.get(url=Base_Url, timeout=15)
     req.raise_for_status()  # 检查返回值
     req_date = req.json()
     request_data = {
