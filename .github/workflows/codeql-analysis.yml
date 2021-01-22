@@ -16,9 +16,9 @@ on:
   push:
     branches: [ master ]
     paths:
-      - '*.py'
       - '.github/workflows/codeql-analysis.yml'
-
+  schedule:
+    - cron: 15 12 * * *
 jobs:
   analyze:
     name: Analyze
