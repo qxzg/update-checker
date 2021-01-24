@@ -1,11 +1,12 @@
 import requests
 
 Base_Url = "https://www.asus.com.cn/support/api/product.asmx/GetPDDrivers?osid=8&website=cn&pdhashedid=pezdd5ujcut73gz5&model=RT-AX86U"
+headers = {'user-agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:84.0) Gecko/20100101 Firefox/84.0"}
 
 
 def get_info():
     global request_data
-    req = requests.get(url=Base_Url, timeout=15)
+    req = requests.get(url=Base_Url, headers=headers, timeout=15)
     req.raise_for_status()  # 检查返回值
     req_date = req.json()
     request_data = {

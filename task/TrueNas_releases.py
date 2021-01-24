@@ -1,11 +1,12 @@
 import requests
 
 Base_Url = "https://download.freenas.org/latest/CHECKSUMS.json"
+headers = {'user-agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:84.0) Gecko/20100101 Firefox/84.0"}
 
 
 def get_info():
     global request_data
-    req = requests.get(url=Base_Url, timeout=15)
+    req = requests.get(url=Base_Url, headers=headers, timeout=15)
     req_data = req.json()
     request_data = {
         'Version': int(req_data['date']),

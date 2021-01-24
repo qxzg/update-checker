@@ -2,11 +2,12 @@ import requests
 from bs4 import BeautifulSoup
 
 Base_Url = "https://jm.wmzhe.com/"
+headers = {'user-agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:84.0) Gecko/20100101 Firefox/84.0"}
 
 
 def get_info():
     global request_data
-    req = requests.get(url=Base_Url, timeout=15)
+    req = requests.get(url=Base_Url, headers=headers, timeout=15)
     req.encoding = "UTF-8"
     soup = BeautifulSoup(req.text, "lxml")
     request_data = {
