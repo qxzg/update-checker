@@ -59,7 +59,7 @@ def get_push_info(target_push_id):
     获取目标的推送信息
     返回一个字典，包含该推送目标的所有信息
     """
-    get_push_info_sql = "SELECT * FROM `push` WHERE `push_id` = '%s" % (str(target_push_id))
+    get_push_info_sql = "SELECT * FROM `push` WHERE `push_id` = '%s'" % (str(target_push_id))
     gpi_cursor = db.cursor()
     try:
         gpi_cursor.execute(get_push_info_sql)
@@ -75,6 +75,7 @@ def get_push_info(target_push_id):
         }
     except:
         print("[get_push_info] Error: unable to fetch data")
+        traceback.print_exc()
         return "error"
     return gpi_info
 
@@ -91,6 +92,7 @@ def get_config(config_name):
         gc_cursor.close
         return gc_results[2]
     except:
+        traceback.print_exc()
         print("[get_push_info] Error: unable to fetch data")
         return "error"
 
