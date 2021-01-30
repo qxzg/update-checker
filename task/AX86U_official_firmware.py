@@ -13,7 +13,7 @@ def get_info():
         'Version': req_date['Result']['Obj'][0]['Files'][0]['Version'],
         'ReleaseDate': req_date['Result']['Obj'][0]['Files'][0]['ReleaseDate'],
         'DownloadUrl': req_date['Result']['Obj'][0]['Files'][0]['DownloadUrl']['China'],
-        'Text': req_date['Result']['Obj'][0]['Files'][0]['Description'].replace("<br/><br/>", "<br/>".replace("<br/>", "  \n#####"))
+        'Text': req_date['Result']['Obj'][0]['Files'][0]['Description'].replace("<br/><br/>", "<br/>".replace("<br/>", "  \n##### "))
     }
     """
     print(req_date['Result']['Obj'][0]['Name'])
@@ -35,7 +35,7 @@ def check_update(latest_version):
     for i in range(len(ver1)):
         if int(ver1[i]) < int(ver2[i]):
             release_date = request_data['ReleaseDate'].replace("/", "-")
-            text = "请前往[https://www.asus.com.cn/Networking/RT-AX86U/HelpDesk_BIOS/](https://www.asus.com.cn/Networking/RT-AX86U/HelpDesk_BIOS/)下载  \n####更新日志：  \n#####" + \
+            text = "请前往[https://www.asus.com.cn/Networking/RT-AX86U/HelpDesk_BIOS/](https://www.asus.com.cn/Networking/RT-AX86U/HelpDesk_BIOS/)下载  \n#### 更新日志：  \n##### " + \
                 request_data['Text']
             return ["success", 1, request_data['Version'], release_date, text]
     return ["success", 0]
