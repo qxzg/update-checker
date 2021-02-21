@@ -7,3 +7,7 @@ DATABASE_CONFIG = {
     'password': 'pass',
     'charset': 'utf8mb4'
 }
+LogFile = "./update-checker.log"
+FileLogLevel = "INFO"  # 日志级别，取值：DEBUG，INFO，WARNING，ERROR，CRITICAL
+StreamLogLevel = "DEBUG"
+LogFormat = "%(asctime)s - %(name)s - [%(levelname)s]: %(message)s"

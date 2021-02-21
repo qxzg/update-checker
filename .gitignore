@@ -4,3 +4,4 @@ update_check.log
 .venv/
 *.html
 *.json
+update-checker.log

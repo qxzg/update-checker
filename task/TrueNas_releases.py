@@ -15,7 +15,7 @@ def get_info():
     }
 
 
-def check_update(latest_version):
+def check_update(latest_version, logger=None):
     get_info()
     latest_version = int(latest_version)
     if latest_version < request_data['Version']:

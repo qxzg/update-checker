@@ -1,5 +1,6 @@
-import requests
 import re
+
+import requests
 from bs4 import BeautifulSoup
 
 Base_Url = "https://koolshare.cn/thread-181845-1-1.html"
@@ -21,11 +22,11 @@ def get_info():
     return data
 
 
-def check_update(latest_version):
+def check_update(latest_version, logger=None):
     data = get_info()
     latest_version = latest_version.split('_')
     ver2 = data['Version'].split('_')
-    print(latest_version, ver2)
+    logger.debug(str(latest_version) + str(ver2))
     if len(latest_version) == len(ver2):
         for i in range(len(latest_version)):
             if int(latest_version[i]) < int(ver2[i]):

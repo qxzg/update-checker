@@ -1,16 +1,33 @@
 #!/usr/bin/python3
 # -*- coding: UTF-8 -*-
 import importlib
-import smtplib
-import pymysql
-import requests
-import time
-import config
-import task  # 可以通过task.tasks获取模块名
 import logging
 import pathlib
+import smtplib
+import time
 import traceback
 
+import pymysql
+import requests
+
+import config
+import task  # 可以通过task.tasks获取模块名
+
+logger = logging.getLogger()
+logger.setLevel('DEBUG')
+formatter = logging.Formatter(config.LogFormat)
+chlr = logging.StreamHandler()
+chlr.setFormatter(formatter)
+chlr.setLevel(config.StreamLogLevel)
+logger.addHandler(chlr)
+try:
+    fhlr = logging.FileHandler(filename=config.LogFile, encoding='utf-8')  # only work on python>=3.9
+except ValueError:
+    fhlr = logging.FileHandler(filename=config.LogFile)
+fhlr.setFormatter(formatter)
+fhlr.setLevel(config.FileLogLevel)
+del formatter
+logger.addHandler(fhlr)
 
 def push(push_through, target_id, push_message, push_title="更新检查器推送"):
     """
@@ -27,10 +44,10 @@ def push(push_through, target_id, push_message, push_title="更新检查器推�
         time.sleep(3)
         sc_req.raise_for_status()
         if sc_req.json()['data']['error'] == "SUCCESS":
-            print("SC Push Success!")
+            logger.info("SC Push Success!")
             return
         else:
-            print("推送错误："+sc_req.json())
+            logger.exception("推送错误："+sc_req.json())
             return "fail"
     elif push_through == "tg":
         return
@@ -74,8 +91,7 @@ def get_push_info(target_push_id):
             'tg_chat_id': gpi_results[5]
         }
     except:
-        print("[get_push_info] Error: unable to fetch data")
-        traceback.print_exc()
+        logger.exception("[get_push_info] Error: unable to fetch data")
         return "error"
     return gpi_info
 
@@ -92,8 +108,7 @@ def get_config(config_name):
         gc_cursor.close
         return gc_results[2]
     except:
-        traceback.print_exc()
-        print("[get_push_info] Error: unable to fetch data")
+        logger.exception("[get_push_info] Error: unable to fetch data")
         return "error"
 
 
@@ -146,18 +161,17 @@ def get_task():
 def main():
     connect_db()
     get_task()
-
     for i in range(0, task_count):
         if tasks[i]['enabled'] != "yes":
             continue
         try:
             imp = importlib.import_module("task." + tasks[i]['module_name'])
         except ModuleNotFoundError:  # 无法找到模块时抛出错误
-            print("[Error]")
-            traceback.print_exc()
-            push("sc", 1, "#### Error log:   \n ```  \n%s  \n```  \n" % (traceback.format_exc()), "【update-checker】模块无法找到错误")
+            logger.exception("[Error]")
+            push("sc", 1, "#### Error log:   \n ```  \n%s  \n```  \n" %
+                 (traceback.format_exc()), "【update-checker】模块无法找到错误")
             continue
-        check_result = imp.check_update(tasks[i]['latest_version'])
+        check_result = imp.check_update(tasks[i]['latest_version'], logger)
         # check_update函数，返回一个list。[状态(success,error), 如果状态为error则为错误信息，如果为success则为是否有更新(0为无更新，1为有更新)，如果有更新则依次为新版本号，发布时间，发布内容]
         if (check_result[0] != "error" and check_result[0] != "success") or (check_result[0] == "success" and (check_result[1] != 0 and check_result[1] != 1)):
             update_sql = "UPDATE `task` SET `task_status` = 'error', `enabled` = 'no' WHERE `task_id` = %d" % (i + 1)
@@ -176,7 +190,7 @@ def main():
             update_sql = "UPDATE `task` SET `task_status` = 'success' WHERE `task_id` = %d" % (i + 1)
         cursor = db.cursor()
         try:
-            print(update_sql)
+            logger.debug(update_sql)
             cursor.execute(update_sql)
             db.commit()
         except:
@@ -189,3 +203,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    pass

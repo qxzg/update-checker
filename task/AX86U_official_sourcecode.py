@@ -15,21 +15,13 @@ def get_info():
         'DownloadUrl': req_date['Result']['Obj'][1]['Files'][0]['DownloadUrl']['China'],
         'Text': req_date['Result']['Obj'][1]['Files'][0]['Title']
     }
-    """
-    print(req_date['Result']['Obj'][1]['Name'])
-    print(req_date['Result']['Obj'][1]['Files'][0]['Version'])
-    print(req_date['Result']['Obj'][1]['Files'][0]['ReleaseDate'])
-    print(req_date['Result']['Obj'][1]['Files'][0]['DownloadUrl']['China'])
-    print(req_date['Result']['Obj'][1]['Files'][0]['Title'])
-    """
-    return
 
 
-def check_update(latest_version):
+def check_update(latest_version, logger=None):
     get_info()
     ver1 = latest_version.split('.')
     ver2 = request_data['Version'].split('.')
-    print(ver1, ver2)
+    logger.debug(str(ver1) + str(ver2))
     if len(ver1) != len(ver2):
         return ["error", "[AX86U_official_sourcecode] 版本号长度不匹配"]
     for i in range(len(ver1)):
@@ -44,4 +36,3 @@ def check_update(latest_version):
 
 if __name__ == '__main__':
     print(check_update("3.0.0.4.386.41535"))
-# get_version()
