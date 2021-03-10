@@ -2,6 +2,7 @@ import requests
 
 Base_Url = "https://www.asus.com.cn/support/api/product.asmx/GetPDDrivers?osid=8&website=cn&pdhashedid=pezdd5ujcut73gz5&model=RT-AX86U"
 headers = {'user-agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:84.0) Gecko/20100101 Firefox/84.0"}
+asus_webpage_url = "https://www.asus.com.cn/Networking-IoT-Servers/WiFi-6/All-series/RT-AX86U/HelpDesk_BIOS/"
 
 
 def get_info():
@@ -18,6 +19,8 @@ def get_info():
 
 
 def check_update(latest_version, logger=None):
+    return ["error", "[AX86U_official_sourcecode] AX86U官方源码暂时不可用"]
+    """
     get_info()
     ver1 = latest_version.split('.')
     ver2 = request_data['Version'].split('.')
@@ -29,10 +32,10 @@ def check_update(latest_version, logger=None):
             release_date = request_data['ReleaseDate'].replace("/", "-")
             text = "#### " + \
                 request_data['Text'] + \
-                "   \n#### 请前往[华硕官网](https://www.asus.com.cn/Networking/RT-AX86U/HelpDesk_Download/)下载"
+                "   \n#### 请前往[%s](%s)下载" % (asus_webpage_url, asus_webpage_url)
             return ["success", 1, request_data['Version'], release_date, text]
     return ["success", 0]
-
+    """
 
 if __name__ == '__main__':
     print(check_update("3.0.0.4.386.41535"))
