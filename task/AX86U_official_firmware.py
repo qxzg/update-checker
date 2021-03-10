@@ -2,6 +2,7 @@ import requests
 
 Base_Url = "https://www.asus.com.cn/support/api/product.asmx/GetPDDrivers?osid=8&website=cn&pdhashedid=pezdd5ujcut73gz5&model=RT-AX86U"
 headers = {'user-agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:84.0) Gecko/20100101 Firefox/84.0"}
+asus_webpage_url = "https://www.asus.com.cn/Networking-IoT-Servers/WiFi-6/All-series/RT-AX86U/HelpDesk_BIOS/"
 
 
 def get_info():
@@ -27,7 +28,7 @@ def check_update(latest_version, logger=None):
     for i in range(len(ver1)):
         if int(ver1[i]) < int(ver2[i]):
             release_date = request_data['ReleaseDate'].replace("/", "-")
-            text = "请前往[https://www.asus.com.cn/Networking/RT-AX86U/HelpDesk_BIOS/](https://www.asus.com.cn/Networking/RT-AX86U/HelpDesk_BIOS/)下载  \n#### 更新日志：  \n##### " + \
+            text = "请前往[%s](%s)下载  \n#### 更新日志：  \n##### " % (asus_webpage_url, asus_webpage_url)+ \
                 request_data['Text']
             return ["success", 1, request_data['Version'], release_date, text]
     return ["success", 0]
