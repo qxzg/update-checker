@@ -174,20 +174,20 @@ def main():
         check_result = imp.check_update(tasks[i]['latest_version'], logger)
         # check_update函数，返回一个list。[状态(success,error), 如果状态为error则为错误信息，如果为success则为是否有更新(0为无更新，1为有更新)，如果有更新则依次为新版本号，发布时间，发布内容]
         if (check_result[0] != "error" and check_result[0] != "success") or (check_result[0] == "success" and (check_result[1] != 0 and check_result[1] != 1)):
-            update_sql = "UPDATE `task` SET `task_status` = 'error', `enabled` = 'no' WHERE `task_id` = %d" % (i + 1)
+            update_sql = "UPDATE `task` SET `task_status` = 'error', `enabled` = 'no' WHERE `task_id` = %d" % (tasks[i]['task_id'])
             push("sc", tasks[i]['push_to'], "##### 【update-checker】 模块 `%s` 返回值错误，现已禁用该任务，请尽快检查该模块！  \n返回值为：  \n```  \n %s  \n```  \n" %
                  (tasks[i]['task_name'], check_result), "模块%s出错!" % (tasks[i]['task_name']))
         elif check_result[0] == "error":  # TODO 多次连续错误禁用该任务
-            update_sql = "UPDATE `task` SET `task_status` = 'error' WHERE `task_id` = %d" % (i + 1)
+            update_sql = "UPDATE `task` SET `task_status` = 'error' WHERE `task_id` = %d" % (tasks[i]['task_id'])
             push("sc", tasks[i]['push_to'], "##### 【update-checker】 更新检查任务 `%s` 失败。  \n##### 错误信息：  \n```  \n %s  \n```  \n" %
                  (tasks[i]['task_name'], check_result[1]), "%s 检查更新时出错!" % (tasks[i]['task_name']))
             pass  # TODO 更新最后运行时间以及状态
         elif check_result[1] == 1:  # 如果有更新：
             push("sc", tasks[i]['push_to'], check_result[4], "%s_检测到更新了！" % (tasks[i]['task_name']))
             update_sql = "UPDATE `task` SET `task_status` = 'success', `latest_version` = '%s', `release_date` = '%s' WHERE `task_id` = %d" % (
-                check_result[2], check_result[3], i + 1)
+                check_result[2], check_result[3], tasks[i]['task_id'])
         else:
-            update_sql = "UPDATE `task` SET `task_status` = 'success' WHERE `task_id` = %d" % (i + 1)
+            update_sql = "UPDATE `task` SET `task_status` = 'success' WHERE `task_id` = %d" % (tasks[i]['task_id'])
         cursor = db.cursor()
         try:
             logger.debug(update_sql)
