@@ -147,7 +147,8 @@ def get_task():
                 'task_status': row[4],
                 'last_run': row[5],
                 'latest_version': row[6],
-                'push_to': row[8]
+                'push_to': row[8],
+                'use_proxy': row[9],
             })
     except:
         pass
