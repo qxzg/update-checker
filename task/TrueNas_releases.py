@@ -1,12 +1,14 @@
+from traceback import format_exc
+
 import requests
 
 Base_Url = "https://download.freenas.org/latest/CHECKSUMS.json"
 headers = {'user-agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:84.0) Gecko/20100101 Firefox/84.0"}
 
 
-def get_info():
+def get_info(proxy=None):
     global request_data
-    req = requests.get(url=Base_Url, headers=headers, timeout=15)
+    req = requests.get(url=Base_Url, headers=headers, timeout=15, proxies=proxy)
     req_data = req.json()
     request_data = {
         'Version': int(req_data['date']),
@@ -15,8 +17,11 @@ def get_info():
     }
 
 
-def check_update(latest_version, logger=None):
-    get_info()
+def check_update(latest_version, proxy=None, logger=None):
+    try:
+        get_info(proxy)
+    except:
+        return ["error", format_exc()]
     latest_version = int(latest_version)
     if latest_version < request_data['Version']:
         return ["success", 1, request_data['Version'], request_data['ReleaseDate'], "#### " + request_data['Text'] + " 已发布  \n #### Changelog: https://www.truenas.com/docs/hub/intro/release-notes/" + request_data['Text'].lower().replace("-", "")[7:]]

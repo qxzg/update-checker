@@ -68,7 +68,6 @@ def connect_db():
                          password=config.DATABASE_CONFIG['password'],
                          db=config.DATABASE_CONFIG['dbname'],
                          charset=config.DATABASE_CONFIG['charset'])
-    return
 
 
 def get_push_info(target_push_id):
@@ -100,7 +99,7 @@ def get_config(config_name):
     """
     从数据库获取配置
     """
-    get_config_sql = "SELECT * FROM `config` WHERE `config_name` = '%s" % (config_name)
+    get_config_sql = "SELECT * FROM `config` WHERE `config_name` = '%s'" % (config_name)
     gc_cursor = db.cursor()
     try:
         gc_cursor.execute(get_config_sql)
@@ -161,6 +160,8 @@ def get_task():
 def main():
     connect_db()
     get_task()
+    proxy = get_config('Proxy')
+    proxies = {'http': proxy, 'https': proxy}
     for i in range(0, task_count):
         if tasks[i]['enabled'] != "yes":
             continue
@@ -171,7 +172,10 @@ def main():
             push("sc", 1, "#### Error log:   \n ```  \n%s  \n```  \n" %
                  (traceback.format_exc()), "【update-checker】模块无法找到错误")
             continue
-        check_result = imp.check_update(tasks[i]['latest_version'], logger)
+        if tasks[i]['use_proxy'] == 'yes':
+            check_result = imp.check_update(tasks[i]['latest_version'], logger=logger, proxy=proxies)
+        else:
+            check_result = imp.check_update(tasks[i]['latest_version'], logger=logger)
         # check_update函数，返回一个list。[状态(success,error), 如果状态为error则为错误信息，如果为success则为是否有更新(0为无更新，1为有更新)，如果有更新则依次为新版本号，发布时间，发布内容]
         if (check_result[0] != "error" and check_result[0] != "success") or (check_result[0] == "success" and (check_result[1] != 0 and check_result[1] != 1)):
             update_sql = "UPDATE `task` SET `task_status` = 'error', `enabled` = 'no' WHERE `task_id` = %d" % (tasks[i]['task_id'])

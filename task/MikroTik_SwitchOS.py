@@ -9,21 +9,20 @@ Base_Url = "https://mikrotik.com/download"
 headers = {'user-agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:86.0) Gecko/20100101 Firefox/86.0"}
 
 
-def get_info():
+def get_info(proxy=None):
     global request_data
-    req = requests.get(url=Base_Url, headers=headers, timeout=15)
+    req = requests.get(url=Base_Url, headers=headers, timeout=15, proxies=proxy)
     req.encoding = "UTF-8"
     soup = BeautifulSoup(req.text, 'lxml')
     request_data = {
         'Version': str(re.findall(r'css309-(.*)\.bin', (str(soup.find_all('table', class_='table downloadTable')[2].find_all('a', href=re.compile('css309'))[0])))[0]),
         'ReleaseDate': time.strftime("%Y-%m-%d", time.localtime())
     }
-    return
 
 
-def check_update(latest_version, logger=None):
+def check_update(latest_version, proxy=None, logger=None):
     try:
-        get_info()
+        get_info(proxy)
     except:
         return ["error", format_exc()]
     if latest_version != request_data['Version']:
