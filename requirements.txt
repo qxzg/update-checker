@@ -2,4 +2,4 @@ PyMySQL==1.0.2
 requests==2.25.1
 beautifulsoup4==4.9.3
 lxml==4.6.3
-requests[socks]==0.10.8
+PySocks==1.7.1
