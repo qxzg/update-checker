@@ -8,7 +8,10 @@ headers = {'user-agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:84.0) Gec
 
 def get_info(proxy=None):
     global request_data
-    req = requests.get(url=Base_Url, headers=headers, timeout=15, proxies=proxy)
+    try:
+        req = requests.get(url=Base_Url, headers=headers, timeout=15)
+    except:
+        req = requests.get(url=Base_Url, headers=headers, timeout=15, proxies=proxy)
     req_data = req.json()
     request_data = {
         'Version': int(req_data['date']),

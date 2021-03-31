@@ -11,7 +11,10 @@ headers = {'user-agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:86.0) Gec
 
 def get_info(proxy=None):
     global request_data
-    req = requests.get(url=Base_Url, headers=headers, timeout=15, proxies=proxy)
+    try:
+        req = requests.get(url=Base_Url, headers=headers, timeout=15)
+    except:
+        req = requests.get(url=Base_Url, headers=headers, timeout=15, proxies=proxy)
     req.encoding = "UTF-8"
     soup = BeautifulSoup(req.text, 'lxml')
     request_data = {
