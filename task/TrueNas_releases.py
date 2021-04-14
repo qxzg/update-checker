@@ -17,7 +17,7 @@ def get_info(proxy=None):
         'Version': int(req_data['date']),
         'ReleaseDate': '-'.join([req_data['date'][:4], req_data['date'][4:6], req_data['date'][6:8], req_data['date'][8:10], req_data['date'][10:12]]),
         'Text': req_data['arch']['amd64'][0]['filename'][:-4]
-    }
+        }
 
 
 def check_update(latest_version, proxy=None, logger=None):
@@ -27,7 +27,7 @@ def check_update(latest_version, proxy=None, logger=None):
         return ["error", format_exc()]
     latest_version = int(latest_version)
     if latest_version < request_data['Version']:
-        return ["success", 1, request_data['Version'], request_data['ReleaseDate'], "#### " + request_data['Text'] + " 已发布  \n #### Changelog: https://www.truenas.com/docs/hub/intro/release-notes/" + request_data['Text'].lower().replace("-", "")[7:]]
+        return ["success", 1, request_data['Version'], request_data['ReleaseDate'], "#### " + request_data['Text'] + " 已发布  \n #### Changelog: https://www.truenas.com/docs/releasenotes/core/" + request_data['Text'].lower().replace("-", "")[7:]]
     else:
         return ["success", 0]
 
