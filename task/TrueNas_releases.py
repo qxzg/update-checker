@@ -6,8 +6,7 @@ Base_Url = "https://download.freenas.org/latest/CHECKSUMS.json"
 headers = {'user-agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:84.0) Gecko/20100101 Firefox/84.0"}
 
 
-def get_info(proxy=None):
-    global request_data
+def get_info(proxy=None) -> dict:
     try:
         req = requests.get(url=Base_Url, headers=headers, timeout=15)
     except:
@@ -18,11 +17,12 @@ def get_info(proxy=None):
         'ReleaseDate': '-'.join([req_data['date'][:4], req_data['date'][4:6], req_data['date'][6:8], req_data['date'][8:10], req_data['date'][10:12]]),
         'Text': req_data['arch']['amd64'][0]['filename'][:-4]
         }
+    return request_data
 
 
 def check_update(latest_version, proxy=None, logger=None):
     try:
-        get_info(proxy)
+        request_data = get_info(proxy)
     except:
         return ["error", format_exc()]
     latest_version = int(latest_version)
